@@ -74,7 +74,7 @@ router.get('/home', ensureLogin.ensureLoggedIn(), (req, res) => {
   Events.find()
     .then((result) => {
       let mainEvents;
-      let leftEvents;    
+      let leftEvents;
       const a = result.sort((a, b) => b.rate - a.rate);
       mainEvents = a.slice(0, 3);
       leftEvents = a.slice(3);
@@ -111,7 +111,7 @@ router.post('/events/new', ensureLogin.ensureLoggedIn(), uploadCloud.single('pho
     title, category, photoName, photo, clan, text, rate, date, dateTime, creator, address,
   });
   newEvent.save()
-    .then((event) => {      
+    .then((event) => {
       res.redirect('/home');
     })
     .catch((error) => {
@@ -138,10 +138,10 @@ router.post('/events/:id/edit', ensureLogin.ensureLoggedIn(), uploadCloud.single
   const dateTime = date;
   // eslint-disable-next-line max-len
   Events.findByIdAndUpdate(req.params.id, {
- $set: {
-    title, category, rate, photoName, photo, text, date, dateTime, clan, address,
-  } 
-})
+    $set: {
+      title, category, rate, photoName, photo, text, date, dateTime, clan, address,
+    },
+  })
     .then((result) => {
       console.log(result);
       res.redirect('/home');
@@ -164,32 +164,35 @@ router.get('/events/:id/delet', ensureLogin.ensureLoggedIn(), (req, res, next) =
 router.get('/events/:id', ensureLogin.ensureLoggedIn(), (req, res, next) => {
   Events.findById({ _id: req.params.id })
     .populate('creator')
-    .then((result) => {      
+    .then((result) => {
+      const { GMAP } = process.env;
       if (req.user.role === 'ADMIN') {
         const options = {
           weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
         };
         const dateTime = result.date.toLocaleDateString('en-US', options);
         res.render('event-detail', {
-          admin: req.user.role, user: req.user, event: result, date: dateTime,
+          admin: req.user.role, user: req.user, event: result, date: dateTime, GMAP,
         });
       } else {
         const options = {
           weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
         };
         const dateTime = result.date.toLocaleDateString('en-US', options);
-        res.render('event-detail', { user: req.user, event: result, date: dateTime });
+        res.render('event-detail', {
+          user: req.user, event: result, date: dateTime, GMAP,
+        });
       }
     })
     .catch((error) => {
       console.log('Error while retrieving event details: ', error);
     });
-},);
+});
 
 router.post('/events/:id/confirmation', ensureLogin.ensureLoggedIn(), (req, res, next) => {
   Events.findById({ _id: req.params.id })
   // .populate('users')
-    .then((result) => {      
+    .then((result) => {
       if (!result.users.includes(req.user._id)) {
         Events.findOneAndUpdate({ _id: req.params.id }, { $push: { users: req.user._id } })
           .then(() => {
@@ -207,7 +210,7 @@ router.post('/events/:id/confirmation', ensureLogin.ensureLoggedIn(), (req, res,
 router.get('/events/:id/users', ensureLogin.ensureLoggedIn(), (req, res) => {
   Events.findById({ _id: req.params.id })
     .populate('users')
-    .then((event) => {      
+    .then((event) => {
       res.render('users', { user: req.user, event });
     })
     .catch((error) => {
