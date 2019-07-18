@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // eslint-disable-next-line import/no-unresolved
 
 const dbName = 'gammunity';
-mongoose.connect('mongodb://heroku_q3tgdh8k:8d9ounpkos1dsol1ht5nfm96tn@ds151066.mlab.com:51066/heroku_q3tgdh8k');
+mongoose.connect('localhost/lab-express-file-upload');
 
 // const Events = require('../models/Event');
 const Users = require('../models/User');
