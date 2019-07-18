@@ -7,4 +7,4 @@ npm-debug.log
 # Environment Variables should NEVER be published
 .env
 
-seeds.js
+bin/seeds.js
